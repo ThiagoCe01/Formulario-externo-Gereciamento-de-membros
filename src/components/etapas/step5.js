@@ -1,16 +1,21 @@
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import React from "react";
+import { useFormContext } from "react-hook-form";
 
 const Step5 = () => {
-  const { register, formState: { errors } } = useFormContext();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <div className="form-step">
       <h2 className="text-xl font-semibold mb-4">Conhecimento Teológico</h2>
-      
+
       <div className="grid grid-cols-1 gap-4">
         <div className="mb-4">
-          <label htmlFor="conviccaodiscipulo" className="form-label">Qual sua convicção sobre ser discípulo de Jesus?</label>
+          <label htmlFor="conviccaodiscipulo" className="form-label">
+            Qual sua convicção sobre ser discípulo de Jesus?
+          </label>
           <textarea
             id="conviccaodiscipulo"
             className="form-input w-full h-32"
@@ -21,9 +26,11 @@ const Step5 = () => {
             <p className="form-error">{errors.conviccaodiscipulo.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="definicaoevangelho" className="form-label">Como você define o evangelho?</label>
+          <label htmlFor="definicaoevangelho" className="form-label">
+            Como você define o evangelho?
+          </label>
           <textarea
             id="definicaoevangelho"
             className="form-input w-full h-32"
@@ -34,9 +41,11 @@ const Step5 = () => {
             <p className="form-error">{errors.definicaoevangelho.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="frutosespirito" className="form-label">Quais são os frutos do Espírito?</label>
+          <label htmlFor="frutosespirito" className="form-label">
+            Quais são os frutos do Espírito você desenvolve em sua vida?
+          </label>
           <textarea
             id="frutosespirito"
             className="form-input w-full h-32"
@@ -49,7 +58,9 @@ const Step5 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="desenvolvimentodafe" className="form-label">Como você cuida do desenvolvimento da sua fé?</label>
+          <label htmlFor="desenvolvimentodafe" className="form-label">
+            Como você cuida do desenvolvimento da sua fé?
+          </label>
           <textarea
             id="desenvolvimentodafe"
             className="form-input w-full h-32"
@@ -60,9 +71,11 @@ const Step5 = () => {
             <p className="form-error">{errors.desenvolvimentodafe.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="pecado" className="form-label">Você tem cometido algum pecado recentemente?</label>
+          <label htmlFor="pecado" className="form-label">
+            Você tem lutado contra algum pecado recentemente?
+          </label>
           <textarea
             id="pecado"
             className="form-input w-full h-32"
@@ -75,7 +88,9 @@ const Step5 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="conviccaoteologica" className="form-label">Quais são suas convicções teológicas?</label>
+          <label htmlFor="conviccaoteologica" className="form-label">
+            Você tem alguma convicção teológica doutrinária?
+          </label>
           <textarea
             id="conviccaoteologica"
             className="form-input w-full h-32"
@@ -87,10 +102,12 @@ const Step5 = () => {
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="mb-4">
-          <label htmlFor="evangelizar" className="form-label">Você evangeliza?</label>
+          <label htmlFor="evangelizar" className="form-label">
+            Você evangeliza?
+          </label>
           <select
             id="evangelizar"
             className="form-input w-full"
@@ -104,9 +121,11 @@ const Step5 = () => {
             <p className="form-error">{errors.evangelizar.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="jejuar" className="form-label">Você jejua?</label>
+          <label htmlFor="jejuar" className="form-label">
+            Você jejua?
+          </label>
           <select
             id="jejuar"
             className="form-input w-full"
@@ -120,9 +139,11 @@ const Step5 = () => {
             <p className="form-error">{errors.jejuar.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="leiturabiblica" className="form-label">Você lê a Bíblia regularmente?</label>
+          <label htmlFor="leiturabiblica" className="form-label">
+            Você lê a Bíblia regularmente?
+          </label>
           <select
             id="leiturabiblica"
             className="form-input w-full"
@@ -137,10 +158,12 @@ const Step5 = () => {
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 gap-4">
         <div className="mb-4">
-          <label htmlFor="livros" className="form-label">Quais foram os últimos livros que você leu?</label>
+          <label htmlFor="livros" className="form-label">
+            Quais foram os últimos livros que você leu?
+          </label>
           <textarea
             id="livros"
             className="form-input w-full h-32"
@@ -151,9 +174,11 @@ const Step5 = () => {
             <p className="form-error">{errors.livros.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="ultimasconsideracoes" className="form-label">Considerações finais</label>
+          <label htmlFor="ultimasconsideracoes" className="form-label">
+            Considerações finais
+          </label>
           <textarea
             id="ultimasconsideracoes"
             className="form-input w-full h-32"
