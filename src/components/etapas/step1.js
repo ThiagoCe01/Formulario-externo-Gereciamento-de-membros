@@ -1,78 +1,82 @@
-import React, { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import React, { useEffect, useCallback } from "react"; // adicione useCallback
+import { useFormContext } from "react-hook-form";
 import { IMaskInput } from "react-imask";
 
 const Step1 = () => {
-  const { register, formState: { errors }, setValue, watch, getValues } = useFormContext();
-  
-  // Observar mudanças no campo CEP
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    watch,
+    getValues,
+  } = useFormContext();
   const cepValue = watch("cep");
-  
-  // Função para buscar CEP usando fetch
-  const buscaCep = async (cep) => {
-    // Remover caracteres não numéricos
-    cep = cep?.replace(/\D/g, "");
-    
-    // Verificar se o CEP tem 8 dígitos
-    if (!cep || cep.length !== 8) {
-      return;
-    }
-    
-    try {
-      // Indicar carregamento
-      setValue("loadingCep", true);
-      
-      // Fazer requisição para a API ViaCEP
-      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await response.json();
-      
-      // Verificar se a resposta é válida
-      if (!data.erro) {
-        console.log("Dados do CEP:", data);
-        
-        // Preencher os campos com os dados retornados
-        setValue("address", data.logradouro || "", { shouldValidate: true, shouldDirty: true });
-        setValue("district", data.bairro || "", { shouldValidate: true, shouldDirty: true });
-        setValue("city", data.localidade || "", { shouldValidate: true, shouldDirty: true });
-        setValue("state", data.uf || "", { shouldValidate: true, shouldDirty: true });
-        
-        // Focar no campo número após preenchimento automático
-        setTimeout(() => {
-          document.getElementById("number")?.focus();
-        }, 100);
-      } else {
-        console.log("CEP não encontrado");
+
+  // ✅ Função agora estável com useCallback
+  const buscaCep = useCallback(
+    async (cep) => {
+      cep = cep?.replace(/\D/g, "");
+
+      if (!cep || cep.length !== 8) return;
+
+      try {
+        setValue("loadingCep", true);
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+
+        if (!data.erro) {
+          setValue("address", data.logradouro || "", {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          setValue("district", data.bairro || "", {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          setValue("city", data.localidade || "", {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          setValue("state", data.uf || "", {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+
+          setTimeout(() => document.getElementById("number")?.focus(), 100);
+        } else {
+          console.log("CEP não encontrado");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      } finally {
+        setValue("loadingCep", false);
       }
-    } catch (error) {
-      console.error("Erro ao buscar CEP:", error);
-    } finally {
-      setValue("loadingCep", false);
-    }
-  };
-  
-  // Efeito para monitorar mudanças no CEP
+    },
+    [setValue]
+  ); // 👈 Dependência necessária
+
+  // ✅ useEffect com dependência correta
   useEffect(() => {
-    // Verificar se o CEP tem o formato completo (XXXXX-XXX)
     if (cepValue && cepValue.length === 9) {
       buscaCep(cepValue);
     }
-  }, [cepValue]);
+  }, [cepValue, buscaCep]); // 👈 Agora o ESLint fica satisfeito
 
-  // Função para teste manual do CEP
+  // Função de teste manual
   const testeCep = () => {
     const cep = getValues("cep");
-    if (cep) {
-      buscaCep(cep);
-    }
+    if (cep) buscaCep(cep);
   };
 
   return (
     <div className="form-step">
       <h2 className="text-xl font-semibold mb-4">Dados Pessoais</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="mb-4">
-          <label htmlFor="name" className="form-label">Nome Completo</label>
+          <label htmlFor="name" className="form-label">
+            Nome Completo
+          </label>
           <input
             id="name"
             type="text"
@@ -80,13 +84,13 @@ const Step1 = () => {
             placeholder="Digite o seu nome"
             {...register("name")}
           />
-          {errors.name && (
-            <p className="form-error">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="form-error">{errors.name.message}</p>}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="mothersname" className="form-label">Nome da Mãe</label>
+          <label htmlFor="mothersname" className="form-label">
+            Nome da Mãe
+          </label>
           <input
             id="mothersname"
             type="text"
@@ -98,9 +102,11 @@ const Step1 = () => {
             <p className="form-error">{errors.mothersname.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="fathersname" className="form-label">Nome do Pai</label>
+          <label htmlFor="fathersname" className="form-label">
+            Nome do Pai
+          </label>
           <input
             id="fathersname"
             type="text"
@@ -114,7 +120,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="dateBirth" className="form-label">Data de nascimento</label>
+          <label htmlFor="dateBirth" className="form-label">
+            Data de nascimento
+          </label>
           <IMaskInput
             id="dateBirth"
             className="form-input w-full"
@@ -122,31 +130,31 @@ const Step1 = () => {
             placeholder="DD/MM/AAAA"
             mask="00/00/0000"
             {...register("dateBirth")}
-            onAccept={(value) => setValue("dateBirth", value, { shouldValidate: true })}
+            onAccept={(value) =>
+              setValue("dateBirth", value, { shouldValidate: true })
+            }
           />
           {errors.dateBirth && (
             <p className="form-error">{errors.dateBirth.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="sex" className="form-label">Sexo</label>
-          <select
-            id="sex"
-            className="form-input w-full"
-            {...register("sex")}
-          >
+          <label htmlFor="sex" className="form-label">
+            Sexo
+          </label>
+          <select id="sex" className="form-input w-full" {...register("sex")}>
             <option value="">Escolha</option>
             <option value="Masculino">Masculino</option>
             <option value="Feminino">Feminino</option>
           </select>
-          {errors.sex && (
-            <p className="form-error">{errors.sex.message}</p>
-          )}
+          {errors.sex && <p className="form-error">{errors.sex.message}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="telone" className="form-label">Telefone 1</label>
+          <label htmlFor="telone" className="form-label">
+            Telefone 1
+          </label>
           <IMaskInput
             id="telone"
             className="form-input w-full"
@@ -154,7 +162,9 @@ const Step1 = () => {
             mask="(00) 00000-0000"
             placeholder="(00) 00000-0000"
             {...register("telone")}
-            onAccept={(value) => setValue("telone", value, { shouldValidate: true })}
+            onAccept={(value) =>
+              setValue("telone", value, { shouldValidate: true })
+            }
           />
           {errors.telone && (
             <p className="form-error">{errors.telone.message}</p>
@@ -162,7 +172,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="teltwo" className="form-label">Telefone 2</label>
+          <label htmlFor="teltwo" className="form-label">
+            Telefone 2
+          </label>
           <IMaskInput
             id="teltwo"
             className="form-input w-full"
@@ -174,7 +186,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="form-label">E-mail</label>
+          <label htmlFor="email" className="form-label">
+            E-mail
+          </label>
           <input
             id="email"
             type="email"
@@ -182,13 +196,13 @@ const Step1 = () => {
             placeholder="email@email.com"
             {...register("email")}
           />
-          {errors.email && (
-            <p className="form-error">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="national" className="form-label">Nacionalidade</label>
+          <label htmlFor="national" className="form-label">
+            Nacionalidade
+          </label>
           <input
             id="national"
             type="text"
@@ -202,7 +216,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="natural" className="form-label">Naturalidade</label>
+          <label htmlFor="natural" className="form-label">
+            Naturalidade
+          </label>
           <input
             id="natural"
             type="text"
@@ -214,9 +230,11 @@ const Step1 = () => {
             <p className="form-error">{errors.natural.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="profession" className="form-label">Profissão</label>
+          <label htmlFor="profession" className="form-label">
+            Profissão
+          </label>
           <input
             id="profession"
             type="text"
@@ -228,9 +246,11 @@ const Step1 = () => {
             <p className="form-error">{errors.profession.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="companywork" className="form-label">Empresa que trabalha</label>
+          <label htmlFor="companywork" className="form-label">
+            Empresa que trabalha
+          </label>
           <input
             id="companywork"
             type="text"
@@ -244,7 +264,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="education" className="form-label">Grau de escolaridade</label>
+          <label htmlFor="education" className="form-label">
+            Grau de escolaridade
+          </label>
           <select
             id="education"
             className="form-input w-full"
@@ -261,7 +283,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="cep" className="form-label">CEP</label>
+          <label htmlFor="cep" className="form-label">
+            CEP
+          </label>
           <div className="relative flex">
             <IMaskInput
               id="cep"
@@ -270,10 +294,12 @@ const Step1 = () => {
               type="text"
               placeholder="CEP"
               {...register("cep")}
-              onAccept={(value) => setValue("cep", value, { shouldValidate: true })}
+              onAccept={(value) =>
+                setValue("cep", value, { shouldValidate: true })
+              }
             />
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={testeCep}
               className="ml-2 px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md"
             >
@@ -281,21 +307,40 @@ const Step1 = () => {
             </button>
             {watch("loadingCep") && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <svg className="animate-spin h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-5 w-5 text-primary-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               </div>
             )}
           </div>
-          {errors.cep && (
-            <p className="form-error">{errors.cep.message}</p>
-          )}
-          <p className="text-xs text-gray-400 mt-1">Digite o CEP completo e clique em "Buscar" para preencher o endereço automaticamente. O número deverá ser preenchido manualmente.</p>
+          {errors.cep && <p className="form-error">{errors.cep.message}</p>}
+          <p className="text-xs text-gray-400 mt-1">
+            Digite o CEP completo e clique em "Buscar" para preencher o endereço
+            automaticamente. O número deverá ser preenchido manualmente.
+          </p>
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="address" className="form-label">Endereço</label>
+          <label htmlFor="address" className="form-label">
+            Endereço
+          </label>
           <input
             id="address"
             type="text"
@@ -307,9 +352,11 @@ const Step1 = () => {
             <p className="form-error">{errors.address.message}</p>
           )}
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="number" className="form-label">Número</label>
+          <label htmlFor="number" className="form-label">
+            Número
+          </label>
           <input
             id="number"
             type="text"
@@ -323,7 +370,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="complement" className="form-label">Complemento</label>
+          <label htmlFor="complement" className="form-label">
+            Complemento
+          </label>
           <input
             id="complement"
             type="text"
@@ -332,9 +381,11 @@ const Step1 = () => {
             {...register("complement")}
           />
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="district" className="form-label">Bairro</label>
+          <label htmlFor="district" className="form-label">
+            Bairro
+          </label>
           <input
             id="district"
             type="text"
@@ -348,7 +399,9 @@ const Step1 = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="city" className="form-label">Cidade</label>
+          <label htmlFor="city" className="form-label">
+            Cidade
+          </label>
           <input
             id="city"
             type="text"
@@ -356,13 +409,13 @@ const Step1 = () => {
             placeholder="Cidade"
             {...register("city")}
           />
-          {errors.city && (
-            <p className="form-error">{errors.city.message}</p>
-          )}
+          {errors.city && <p className="form-error">{errors.city.message}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="state" className="form-label">Estado</label>
+          <label htmlFor="state" className="form-label">
+            Estado
+          </label>
           <input
             id="state"
             type="text"
@@ -370,13 +423,13 @@ const Step1 = () => {
             placeholder="Estado"
             {...register("state")}
           />
-          {errors.state && (
-            <p className="form-error">{errors.state.message}</p>
-          )}
+          {errors.state && <p className="form-error">{errors.state.message}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="timeinresidence" className="form-label">Quanto tempo está no mesmo endereço?</label>
+          <label htmlFor="timeinresidence" className="form-label">
+            Quanto tempo está no mesmo endereço?
+          </label>
           <input
             id="timeinresidence"
             type="text"
